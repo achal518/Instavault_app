@@ -1,1 +1,10 @@
 .gradle/
+*.jsx
+
+# Local configuration
+local.properties
+
+# Logs
+build_debug.log
+gradle_error.txt
+*.log

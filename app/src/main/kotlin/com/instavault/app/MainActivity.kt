@@ -1,21 +1,19 @@
 package com.instavault.app
 
-import android.app.Activity
 import android.os.Bundle
-import android.widget.TextView
-import android.view.Gravity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.instavault.app.ui.navigation.AppNavigation
+import com.instavault.app.ui.theme.InstavaultTheme
 
-class MainActivity : Activity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Bina XML file ke direct code se UI bana  rahe hain!
-        val textView = TextView(this).apply {
-            text = "Hello Achal! Native Kotlin App is Alive! 🔥"
-            textSize = 24f
-            gravity = Gravity.CENTER
+        setContent {
+            InstavaultTheme {
+                AppNavigation()
+            }
         }
-        
-        setContentView(textView)
     }
 }

@@ -57,7 +57,7 @@ fun HomeScreen(
 fun HomeHeader() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        justifyContent = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
@@ -170,7 +170,7 @@ fun DailyTaskBanner(onClick: () -> Unit) {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            justifyContent = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {

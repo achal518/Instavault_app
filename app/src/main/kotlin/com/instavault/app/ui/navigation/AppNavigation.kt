@@ -64,7 +64,7 @@ fun AppNavigation() {
                 )
             }
             composable("profile") {
-                // Placeholder
+                com.instavault.app.ui.profile.ProfileScreen()
             }
         }
     }

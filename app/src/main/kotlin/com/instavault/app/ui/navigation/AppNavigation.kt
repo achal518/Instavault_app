@@ -14,9 +14,14 @@ fun AppNavigation() {
         composable("login") {
             LoginScreen(
                 onNavigateNext = {
-                    // Navigate to next screen when implemented
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
             )
+        }
+        composable("home") {
+            com.instavault.app.ui.home.HomeScreen()
         }
     }
 }

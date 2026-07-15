@@ -97,6 +97,10 @@ fun LoginScreen(
             exit = fadeOut()
         ) {
             if (state == LoginState.SUCCESS) {
+                LaunchedEffect(Unit) {
+                    delay(1500)
+                    onNavigateNext()
+                }
                 SuccessView(userName = userName ?: "", onReset = { viewModel.reset() })
             } else {
                 LoginView(

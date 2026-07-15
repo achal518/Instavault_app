@@ -169,7 +169,8 @@ fun LoginView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 28.dp, vertical = 40.dp)
+            .padding(horizontal = 28.dp, vertical = 40.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         // Top Logo
         Column(

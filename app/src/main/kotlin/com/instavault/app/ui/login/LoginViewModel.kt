@@ -38,6 +38,14 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun onPaste(pasted: String) {
+        val d = pasted.filter { it.isDigit() }.map { it.toString() }.take(5)
+        if (d.size == 5) {
+            _digits.value = d
+            _loginState.value = LoginState.IDLE
+        }
+    }
+
     fun onConnect() {
         val filled = _digits.value.all { it.isNotEmpty() }
         if (!filled) return

@@ -102,7 +102,8 @@ fun LoginScreen(
                     state = state,
                     onDigitChange = viewModel::onDigitChange,
                     onConnect = viewModel::onConnect,
-                    onFillDemo = viewModel::onFillDemo
+                    onFillDemo = viewModel::onFillDemo,
+                    onPaste = viewModel::onPaste
                 )
             }
         }
@@ -209,7 +210,8 @@ fun LoginView(
     state: LoginState,
     onDigitChange: (Int, String) -> Unit,
     onConnect: () -> Unit,
-    onFillDemo: (String) -> Unit
+    onFillDemo: (String) -> Unit,
+    onPaste: (String) -> Unit
 ) {
     val isFilled = digits.all { it.isNotEmpty() }
     val focusRequesters = remember { List(5) { FocusRequester() } }
@@ -245,6 +247,7 @@ fun LoginView(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
             .padding(horizontal = 28.dp, vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -319,11 +322,22 @@ fun LoginView(
                 BasicTextField(
                     value = d,
                     onValueChange = { 
-                        if (it.length <= 1) {
+                        if (it.length > 1) { // Handle Paste
+                            val digitsPasted = it.filter { char -> char.isDigit() }
+                            if (digitsPasted.length == 5) {
+                                onPaste(digitsPasted)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onConnect() // Auto-connect
+                            }
+                        } else if (it.length <= 1) {
                             onDigitChange(index, it)
                             if (it.isNotEmpty()) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             if (it.isNotEmpty() && index < 4) {
                                 focusRequesters[index + 1].requestFocus()
+                            }
+                            if (it.isNotEmpty() && index == 4) {
+                                // Auto-submit when last digit is typed
+                                onConnect()
                             }
                         }
                     },

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M 60.5,24 L 60.5,50 L 76,50 L 48.5,84 L 48.5,58 L 32,58 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startY="24"
+                android:startX="40"
+                android:endY="84"
+                android:endX="68"
+                android:type="linear">
+                <item android:offset="0" android:color="#FFF5A623"/>
+                <item android:offset="1" android:color="#FFFFD166"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- A glowing ring around it -->
+    <path
+        android:pathData="M54,14 C31.9086,14 14,31.9086 14,54 C14,76.0914 31.9086,94 54,94 C76.0914,94 94,76.0914 94,54 C94,31.9086 76.0914,14 54,14 Z M54,20 C72.7777,20 88,35.2223 88,54 C88,72.7777 72.7777,88 54,88 C35.2223,88 20,72.7777 20,54 C20,35.2223 35.2223,20 54,20 Z"
+        android:fillColor="#408B3FD9" />
+    <path
+        android:pathData="M54,18 C34.1177,18 18,34.1177 18,54 C18,73.8823 34.1177,90 54,90 C73.8823,90 90,73.8823 90,54 C90,34.1177 73.8823,18 54,18 Z M54,22 C71.6731,22 86,36.3269 86,54 C86,71.6731 71.6731,86 54,86 C36.3269,86 22,71.6731 22,54 C22,36.3269 36.3269,22 54,22 Z"
+        android:fillColor="#80B060FF" />
+</vector>

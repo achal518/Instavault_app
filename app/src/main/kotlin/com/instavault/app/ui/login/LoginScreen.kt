@@ -63,7 +63,8 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgBrush),
+            .background(bgBrush)
+            .systemBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         // Splash Screen
@@ -249,45 +250,40 @@ fun LoginView(
         modifier = Modifier
             .fillMaxSize()
             .imePadding()
-            .padding(horizontal = 28.dp, vertical = 40.dp),
+            .padding(horizontal = 28.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top Logo + Help Button
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .shadow(12.dp, CircleShape)
-                        .clip(CircleShape)
-                        .background(Brush.linearGradient(listOf(VaultPurple, VaultPurpleLight)))
-                        .border(2.dp, VaultPurpleLight.copy(alpha = 0.4f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("⚡", fontSize = 32.sp)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("InstaVault", color = VaultWhite, fontSize = 26.sp, fontWeight = FontWeight.Black)
-                Spacer(modifier = Modifier.height(6.dp))
-                Text("CONNECT YOUR ACCOUNT", color = VaultGrey, fontSize = 12.sp, letterSpacing = 1.sp)
-            }
-            
-            // Help Icon at top right
+        // Logo
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .shadow(12.dp, CircleShape)
+                .clip(CircleShape)
+                .background(Brush.linearGradient(listOf(VaultPurple, VaultPurpleLight)))
+                .border(2.dp, VaultPurpleLight.copy(alpha = 0.4f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("⚡", fontSize = 32.sp)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("InstaVault", color = VaultWhite, fontSize = 26.sp, fontWeight = FontWeight.Black)
+        Spacer(modifier = Modifier.height(6.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("CONNECT YOUR ACCOUNT", color = VaultGrey, fontSize = 12.sp, letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.width(4.dp))
             IconButton(
                 onClick = { 
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     showHelp = true 
                 },
-                modifier = Modifier.align(Alignment.TopEnd)
+                modifier = Modifier.size(24.dp)
             ) {
-                Text("❔", fontSize = 20.sp)
+                Text("❔", fontSize = 16.sp)
             }
         }
         
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(48.dp))
         
         Text(
             "Apna 5-digit Vault ID enter karo",
@@ -401,9 +397,7 @@ fun LoginView(
                 Text("❌ Invalid Vault ID", color = VaultRed, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             }
         }
-        
-        Spacer(modifier = Modifier.weight(1.5f))
-        
+        Spacer(modifier = Modifier.height(48.dp))
         // Button Morphing Animation
         val buttonWidth by animateDpAsState(
             targetValue = if (state == LoginState.LOADING) 56.dp else 300.dp,

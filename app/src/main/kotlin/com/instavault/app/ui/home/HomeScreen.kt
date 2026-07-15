@@ -54,7 +54,10 @@ fun HomeScreen(
 }
 
 @Composable
-fun VaultBottomNavigation() {
+fun VaultBottomNavigation(
+    currentRoute: String,
+    onNavigate: (String) -> Unit
+) {
     NavigationBar(
         containerColor = VaultBg,
         tonalElevation = 16.dp,
@@ -62,28 +65,31 @@ fun VaultBottomNavigation() {
     ) {
         NavigationBarItem(
             icon = { Text("🏠", fontSize = 20.sp) },
-            label = { Text("Home", color = VaultGold, fontWeight = FontWeight.Bold) },
-            selected = true,
-            onClick = { },
+            label = { Text("Home", color = if (currentRoute == "home") VaultGold else VaultGrey, fontWeight = if (currentRoute == "home") FontWeight.Bold else FontWeight.Normal) },
+            selected = currentRoute == "home",
+            onClick = { onNavigate("home") },
             colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
         )
         NavigationBarItem(
             icon = { Text("⚡", fontSize = 20.sp) },
-            label = { Text("Tasks", color = VaultGrey) },
-            selected = false,
-            onClick = { }
+            label = { Text("Tasks", color = if (currentRoute == "tasks") VaultGold else VaultGrey, fontWeight = if (currentRoute == "tasks") FontWeight.Bold else FontWeight.Normal) },
+            selected = currentRoute == "tasks",
+            onClick = { onNavigate("tasks") },
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
         )
         NavigationBarItem(
             icon = { Text("🎮", fontSize = 20.sp) },
-            label = { Text("Games", color = VaultGrey) },
-            selected = false,
-            onClick = { }
+            label = { Text("Games", color = if (currentRoute == "games") VaultGold else VaultGrey, fontWeight = if (currentRoute == "games") FontWeight.Bold else FontWeight.Normal) },
+            selected = currentRoute == "games",
+            onClick = { onNavigate("games") },
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
         )
         NavigationBarItem(
             icon = { Text("👤", fontSize = 20.sp) },
-            label = { Text("Me", color = VaultGrey) },
-            selected = false,
-            onClick = { }
+            label = { Text("Me", color = if (currentRoute == "profile") VaultGold else VaultGrey, fontWeight = if (currentRoute == "profile") FontWeight.Bold else FontWeight.Normal) },
+            selected = currentRoute == "profile",
+            onClick = { onNavigate("profile") },
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
         )
     }
 }

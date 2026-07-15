@@ -1,8 +1,11 @@
 package com.instavault.app.ui.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.instavault.app.ui.login.LoginScreen
 
@@ -10,23 +13,55 @@ import com.instavault.app.ui.login.LoginScreen
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "login") {
-        composable("login") {
-            LoginScreen(
-                onNavigateNext = {
-                    navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route ?: "login"
+
+    androidx.compose.material3.Scaffold(
+        bottomBar = {
+            if (currentRoute != "login") {
+                com.instavault.app.ui.home.VaultBottomNavigation(
+                    currentRoute = currentRoute,
+                    onNavigate = { route ->
+                        navController.navigate(route) {
+                            popUpTo("home") { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
-                }
-            )
+                )
+            }
         }
-        composable("home") {
-            com.instavault.app.ui.home.HomeScreen(
-                onNavigateToTasks = { navController.navigate("tasks") }
-            )
-        }
-        composable("tasks") {
-            com.instavault.app.ui.tasks.TasksScreen()
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = "login",
+            modifier = androidx.compose.ui.Modifier.padding(paddingValues)
+        ) {
+            composable("login") {
+                LoginScreen(
+                    onNavigateNext = {
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable("home") {
+                com.instavault.app.ui.home.HomeScreen(
+                    onNavigateToTasks = { navController.navigate("tasks") },
+                    onNavigateToGames = { navController.navigate("games") },
+                    onNavigateToSpin = { navController.navigate("spin") }
+                )
+            }
+            composable("tasks") {
+                com.instavault.app.ui.tasks.TasksScreen()
+            }
+            composable("games") {
+                // Placeholder
+            }
+            composable("profile") {
+                // Placeholder
+            }
         }
     }
 }

@@ -43,82 +43,21 @@ fun LoginScreen(
     val state by viewModel.loginState.collectAsState()
     val userName by viewModel.userName.collectAsState()
 
-    val bgBrush = Brush.radialGradient(
-        colors = listOf(Color(0xFF0D0720), Color(0xFF050510)),
-        center = Offset(0f, 0f),
-        radius = 1500f
-    )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgBrush)
-            .padding(20.dp),
+            .background(VaultBg),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Text(
-                text = "⚡ INSTAVAULT — LOGIN SCREEN",
-                color = Color(0xFF333333),
-                fontSize = 12.sp,
-                letterSpacing = 3.sp,
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-            )
-
-            // Phone Frame
-            Box(
-                modifier = Modifier
-                    .width(375.dp)
-                    .height(780.dp)
-                    .clip(RoundedCornerShape(52.dp))
-                    .background(VaultBg)
-                    .border(8.dp, Color(0xFF111111), RoundedCornerShape(52.dp))
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    // Status Bar
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(44.dp)
-                            .padding(horizontal = 24.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("9:41", color = VaultGrey, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("📶", fontSize = 12.sp)
-                            Text("🔋", fontSize = 12.sp)
-                        }
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        if (state == LoginState.SUCCESS) {
-                            SuccessView(userName = userName ?: "", onReset = { viewModel.reset() })
-                        } else {
-                            LoginView(
-                                digits = digits,
-                                state = state,
-                                onDigitChange = viewModel::onDigitChange,
-                                onConnect = viewModel::onConnect,
-                                onFillDemo = viewModel::onFillDemo
-                            )
-                        }
-                    }
-                }
-            }
-            
-            Text(
-                text = "Try: 00001 • 00847 • 01234",
-                color = Color(0xFF333333),
-                fontSize = 11.sp,
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+        if (state == LoginState.SUCCESS) {
+            SuccessView(userName = userName ?: "", onReset = { viewModel.reset() })
+        } else {
+            LoginView(
+                digits = digits,
+                state = state,
+                onDigitChange = viewModel::onDigitChange,
+                onConnect = viewModel::onConnect,
+                onFillDemo = viewModel::onFillDemo
             )
         }
     }

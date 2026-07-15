@@ -57,7 +57,11 @@ fun AppNavigation() {
                 com.instavault.app.ui.tasks.TasksScreen()
             }
             composable("games") {
-                // Placeholder
+                com.instavault.app.ui.game.GameScreen(
+                    onNavigateToGame = { gameId ->
+                        // Placeholder navigation logic for individual games
+                    }
+                )
             }
             composable("profile") {
                 // Placeholder

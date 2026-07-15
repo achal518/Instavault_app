@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.microapp"
+    namespace = "com.instavault.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.microapp"
+        applicationId = "com.instavault.app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

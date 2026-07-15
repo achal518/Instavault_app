@@ -138,7 +138,7 @@ fun TaskItem(
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                justifyContent = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
                 Row(modifier = Modifier.weight(1f)) {

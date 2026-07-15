@@ -63,8 +63,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgBrush)
-            .systemBarsPadding(),
+            .background(bgBrush),
         contentAlignment = Alignment.Center
     ) {
         // Splash Screen

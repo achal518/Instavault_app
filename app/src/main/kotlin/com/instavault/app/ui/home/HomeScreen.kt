@@ -33,9 +33,8 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(VaultBg)
-            .systemBarsPadding()
             .padding(horizontal = 16.dp),
-        contentPadding = PaddingValues(top = 16.dp, bottom = 90.dp)
+        contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
     ) {
         item { HomeHeader() }
         item { Spacer(modifier = Modifier.height(18.dp)) }

@@ -46,9 +46,8 @@ fun GameScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(VaultBg)
-            .systemBarsPadding()
             .padding(horizontal = 16.dp)
-            .padding(top = 16.dp, bottom = 90.dp) // Bottom padding for navigation
+            .padding(top = 16.dp, bottom = 16.dp)
     ) {
         Text(
             text = "🎮 Games",

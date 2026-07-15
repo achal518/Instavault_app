@@ -236,14 +236,39 @@ fun LoginView(
     }
 
     if (showHelp) {
-        AlertDialog(
-            onDismissRequest = { showHelp = false },
-            title = { Text("Vault ID kahan milega?", color = VaultGold, fontWeight = FontWeight.Bold) },
-            text = { Text("Telegram Bot me jaakar /profile likhiye. Wahan aapko #VLT-XXXXX mil jayega.", color = VaultWhite) },
-            confirmButton = { TextButton(onClick = { showHelp = false }) { Text("Got it", color = VaultPurpleLight) } },
-            containerColor = VaultCard,
-            shape = RoundedCornerShape(20.dp)
-        )
+        androidx.compose.ui.window.Dialog(onDismissRequest = { showHelp = false }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Brush.linearGradient(listOf(VaultCard, Color(0xFF1A142A))))
+                    .border(1.dp, VaultPurple.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
+                    .padding(24.dp)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("💡", fontSize = 40.sp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Find Your Vault ID", color = VaultGold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        "Go to the InstaVault Telegram Bot and type /profile. You will find your unique #VLT-XXXXX ID there.",
+                        color = VaultGreyLight,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 20.sp
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = { showHelp = false },
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = VaultPurple),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Got it", color = VaultWhite, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
     }
     
     Column(
@@ -269,30 +294,28 @@ fun LoginView(
         Spacer(modifier = Modifier.height(16.dp))
         Text("InstaVault", color = VaultWhite, fontSize = 26.sp, fontWeight = FontWeight.Black)
         Spacer(modifier = Modifier.height(6.dp))
+        Text("CONNECT YOUR ACCOUNT", color = VaultGrey, fontSize = 12.sp, letterSpacing = 1.sp)
+        
+        Spacer(modifier = Modifier.height(48.dp))
+        
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("CONNECT YOUR ACCOUNT", color = VaultGrey, fontSize = 12.sp, letterSpacing = 1.sp)
-            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                "Enter your 5-digit Vault ID",
+                color = VaultGreyLight,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             IconButton(
                 onClick = { 
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     showHelp = true 
                 },
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(20.dp)
             ) {
-                Text("❔", fontSize = 16.sp)
+                Text("ℹ️", fontSize = 14.sp)
             }
         }
-        
-        Spacer(modifier = Modifier.height(48.dp))
-        
-        Text(
-            "Apna 5-digit Vault ID enter karo",
-            color = VaultGreyLight,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
         Spacer(modifier = Modifier.height(20.dp))
         
         // Input Row with Shake Animation
@@ -453,9 +476,8 @@ fun LoginView(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        // Developer Mode Toggle
         TextButton(onClick = { showDemo = !showDemo }) {
-            Text(if (showDemo) "Hide Tools" else "Developer Tools", color = VaultGrey, fontSize = 11.sp)
+            Text(if (showDemo) "Hide Demo Accounts" else "Try Demo Account", color = VaultGrey, fontSize = 11.sp)
         }
         
         AnimatedVisibility(visible = showDemo) {

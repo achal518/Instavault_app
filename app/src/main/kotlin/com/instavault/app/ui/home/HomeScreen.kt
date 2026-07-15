@@ -54,6 +54,41 @@ fun HomeScreen(
 }
 
 @Composable
+fun VaultBottomNavigation() {
+    NavigationBar(
+        containerColor = VaultBg,
+        tonalElevation = 16.dp,
+        modifier = Modifier.border(width = 1.dp, color = VaultWhite.copy(alpha = 0.05f))
+    ) {
+        NavigationBarItem(
+            icon = { Text("🏠", fontSize = 20.sp) },
+            label = { Text("Home", color = VaultGold, fontWeight = FontWeight.Bold) },
+            selected = true,
+            onClick = { },
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
+        )
+        NavigationBarItem(
+            icon = { Text("⚡", fontSize = 20.sp) },
+            label = { Text("Tasks", color = VaultGrey) },
+            selected = false,
+            onClick = { }
+        )
+        NavigationBarItem(
+            icon = { Text("🎮", fontSize = 20.sp) },
+            label = { Text("Games", color = VaultGrey) },
+            selected = false,
+            onClick = { }
+        )
+        NavigationBarItem(
+            icon = { Text("👤", fontSize = 20.sp) },
+            label = { Text("Me", color = VaultGrey) },
+            selected = false,
+            onClick = { }
+        )
+    }
+}
+
+@Composable
 fun HomeHeader() {
     Row(
         modifier = Modifier.fillMaxWidth(),

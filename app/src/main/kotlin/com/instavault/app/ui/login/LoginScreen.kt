@@ -53,10 +53,16 @@ fun LoginScreen(
         showSplash = false
     }
 
+    val bgBrush = Brush.radialGradient(
+        colors = listOf(Color(0xFF140D2E), VaultBg),
+        center = Offset(0f, 0f),
+        radius = 1500f
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(VaultBg),
+            .background(bgBrush),
         contentAlignment = Alignment.Center
     ) {
         // Splash Screen
@@ -240,7 +246,6 @@ fun LoginView(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 28.dp, vertical = 40.dp),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Logo + Help Button
@@ -278,7 +283,7 @@ fun LoginView(
             }
         }
         
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.weight(1f))
         
         Text(
             "Apna 5-digit Vault ID enter karo",
@@ -382,7 +387,7 @@ fun LoginView(
             }
         }
         
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.weight(1.5f))
         
         // Button Morphing Animation
         val buttonWidth by animateDpAsState(

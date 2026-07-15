@@ -21,7 +21,12 @@ fun AppNavigation() {
             )
         }
         composable("home") {
-            com.instavault.app.ui.home.HomeScreen()
+            com.instavault.app.ui.home.HomeScreen(
+                onNavigateToTasks = { navController.navigate("tasks") }
+            )
+        }
+        composable("tasks") {
+            com.instavault.app.ui.tasks.TasksScreen()
         }
     }
 }

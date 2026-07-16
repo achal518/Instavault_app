@@ -108,37 +108,54 @@ fun ProfileHeaderCard() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(Brush.linearGradient(listOf(VaultPurple.copy(alpha = 0.27f), VaultCard)))
-            .border(1.dp, VaultPurple.copy(alpha = 0.27f), RoundedCornerShape(24.dp))
-            .padding(20.dp)
+            .padding(bottom = 8.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            // Avatar
+        // Cover Image Area
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(130.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Brush.linearGradient(listOf(VaultPurple.copy(alpha = 0.5f), VaultCard)))
+                .border(1.dp, VaultPurple.copy(alpha = 0.15f), RoundedCornerShape(24.dp))
+        )
+        
+        // Avatar and Info overlay
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 84.dp), // Overlaps the cover (130 - 46 = 84)
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Avatar Ring Cutout
             Box(
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(92.dp)
                     .clip(CircleShape)
-                    .background(Brush.linearGradient(listOf(VaultPurple, VaultPurpleLight)))
-                    .border(3.dp, VaultGold.copy(alpha = 0.27f), CircleShape),
-                contentAlignment = Alignment.Center
+                    .background(VaultBg) // Matches screen background for the cutout effect
+                    .padding(4.dp)
+                    .border(2.dp, VaultPurpleLight, CircleShape)
+                    .padding(3.dp)
             ) {
-                Text("RA", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                // Actual Avatar
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Brush.linearGradient(listOf(VaultGold, VaultPurple))),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("RA", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Black)
+                }
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // User Info
-            Column {
-                Text("Rahul", color = VaultWhite, fontSize = 20.sp, fontWeight = FontWeight.Black)
-                Text(
-                    "#VLT-00001 • Member since May 2025",
-                    color = VaultGrey,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                TagItem("🥉 Rookie Vaulter", VaultGold)
-            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Text("Rahul", color = VaultWhite, fontSize = 24.sp, fontWeight = FontWeight.Black)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("@rahul_vault • #VLT-00001", color = VaultGrey, fontSize = 13.sp)
+            Spacer(modifier = Modifier.height(14.dp))
+            TagItem("🥉 Rookie Vaulter", VaultGold)
         }
     }
 }

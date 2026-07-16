@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,7 +29,7 @@ import com.instavault.app.ui.theme.*
 data class GameData(
     val title: String,
     val sub: String,
-    val icon: String,
+    val icon: ImageVector,
     val reward: String,
     val color: Color,
     val id: String
@@ -80,9 +86,9 @@ fun GameScreen(
             }
             
             val otherGames = listOf(
-                GameData("Quiz Master", "Trivia challenges", "🧠", "Up to 50", VaultBlue, "quiz"),
-                GameData("Predict & Win", "Crypto trends", "📈", "Up to 100", VaultGreen, "predict"),
-                GameData("Tap Frenzy", "Fastest fingers", "⚡", "Up to 30", Color(0xFFFF6B9D), "tap")
+                GameData("Quiz Master", "Trivia challenges", Icons.Filled.Psychology, "Up to 50", VaultBlue, "quiz"),
+                GameData("Predict & Win", "Crypto trends", Icons.Filled.TrendingUp, "Up to 100", VaultGreen, "predict"),
+                GameData("Tap Frenzy", "Fastest fingers", Icons.Filled.TouchApp, "Up to 30", Color(0xFFFF6B9D), "tap")
             )
             
             items(otherGames) { game ->
@@ -127,7 +133,7 @@ fun FeaturedGameCard(title: String, desc: String, icon: String, tag: String, col
                         .border(1.dp, color.copy(alpha = 0.5f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(icon, fontSize = 26.sp)
+                    Icon(Icons.Filled.Casino, contentDescription = "Spin", tint = color, modifier = Modifier.size(26.dp))
                 }
                 
                 // Tag
@@ -185,7 +191,7 @@ fun StandardGameCard(game: GameData, onClick: () -> Unit) {
                 .border(1.dp, game.color.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Text(game.icon, fontSize = 24.sp)
+            Icon(game.icon, contentDescription = game.title, tint = game.color, modifier = Modifier.size(24.dp))
         }
         
         Spacer(modifier = Modifier.width(16.dp))
@@ -205,7 +211,7 @@ fun StandardGameCard(game: GameData, onClick: () -> Unit) {
                 .padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("⚡", fontSize = 11.sp)
+            Icon(Icons.Filled.FlashOn, contentDescription = "Sparks", tint = VaultGold, modifier = Modifier.size(14.dp))
             Spacer(modifier = Modifier.width(4.dp))
             Text(game.reward, color = VaultWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }

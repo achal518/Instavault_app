@@ -10,6 +10,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -307,7 +310,7 @@ fun LinkedInstagramCard() {
                 .border(1.dp, VaultPurple.copy(alpha = 0.4f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Text("📷", fontSize = 18.sp)
+            Icon(com.instavault.app.ui.theme.InstagramIcon, contentDescription = "Instagram", tint = VaultPurple, modifier = Modifier.size(20.dp))
         }
         
         Spacer(modifier = Modifier.width(12.dp))
@@ -346,7 +349,7 @@ fun OrderViewsCTA() {
             contentAlignment = Alignment.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("✈️", fontSize = 18.sp)
+                Icon(Icons.Filled.Send, contentDescription = "Send", tint = Color.White, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Order Views on Bot", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }

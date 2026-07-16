@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -82,7 +84,7 @@ fun LoginScreen(
                         .border(3.dp, VaultPurpleLight.copy(alpha = 0.5f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("⚡", fontSize = 52.sp)
+                    Icon(Icons.Filled.FlashOn, contentDescription = "Logo", tint = VaultWhite, modifier = Modifier.size(52.dp))
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Text("InstaVault", color = VaultWhite, fontSize = 34.sp, fontWeight = FontWeight.Black)
@@ -133,7 +135,7 @@ fun SuccessView(userName: String, onReset: () -> Unit) {
                 .border(3.dp, VaultGreen.copy(alpha = 0.4f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Text("✅", fontSize = 40.sp)
+            Icon(Icons.Filled.CheckCircle, contentDescription = "Success", tint = VaultWhite, modifier = Modifier.size(40.dp))
         }
         Spacer(modifier = Modifier.height(20.dp))
         Text("Connected!", color = VaultWhite, fontSize = 22.sp, fontWeight = FontWeight.Black)
@@ -199,7 +201,11 @@ fun SuccessView(userName: String, onReset: () -> Unit) {
                     .background(Brush.linearGradient(listOf(VaultPurple, VaultPurpleLight))),
                 contentAlignment = Alignment.Center
             ) {
-                Text("🚀 Enter InstaVault", color = VaultWhite, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.RocketLaunch, contentDescription = null, tint = VaultWhite, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Enter InstaVault", color = VaultWhite, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
+                }
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -249,7 +255,7 @@ fun LoginView(
                     .padding(24.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("💡", fontSize = 40.sp)
+                    Icon(Icons.Filled.Lightbulb, contentDescription = null, tint = VaultGold, modifier = Modifier.size(40.dp))
                     Spacer(modifier = Modifier.height(16.dp))
                     Text("Find Your Vault ID", color = VaultGold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(12.dp))
@@ -292,7 +298,7 @@ fun LoginView(
                 .border(2.dp, VaultPurpleLight.copy(alpha = 0.4f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Text("⚡", fontSize = 32.sp)
+            Icon(Icons.Filled.FlashOn, contentDescription = null, tint = VaultWhite, modifier = Modifier.size(32.dp))
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text("InstaVault", color = VaultWhite, fontSize = 26.sp, fontWeight = FontWeight.Black)
@@ -316,7 +322,7 @@ fun LoginView(
                 },
                 modifier = Modifier.size(20.dp)
             ) {
-                Text("ℹ️", fontSize = 14.sp)
+                Icon(Icons.Filled.Info, contentDescription = null, tint = VaultGrey, modifier = Modifier.size(16.dp))
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -420,7 +426,11 @@ fun LoginView(
                         .padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             } else if (state == LoginState.ERROR) {
-                Text("❌ Invalid Vault ID", color = VaultRed, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Error, contentDescription = null, tint = VaultRed, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Invalid Vault ID", color = VaultRed, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
             }
         }
         Spacer(modifier = Modifier.height(48.dp))
@@ -472,7 +482,11 @@ fun LoginView(
                         modifier = Modifier.size(24.dp).rotate(rotation)
                     )
                 } else {
-                    Text("🔗 Connect My Account", color = if (isFilled) VaultWhite else VaultGrey, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Link, contentDescription = null, tint = if (isFilled) VaultWhite else VaultGrey, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Connect My Account", color = if (isFilled) VaultWhite else VaultGrey, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+                    }
                 }
             }
         }

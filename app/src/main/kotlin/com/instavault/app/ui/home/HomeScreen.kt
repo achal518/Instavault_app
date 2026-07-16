@@ -8,6 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -68,32 +74,32 @@ fun VaultBottomNavigation(
         modifier = Modifier.border(width = 1.dp, color = VaultWhite.copy(alpha = 0.05f))
     ) {
         NavigationBarItem(
-            icon = { Text("🏠", fontSize = 20.sp) },
+            icon = { Icon(Icons.Filled.Home, contentDescription = "Home", modifier = Modifier.size(24.dp)) },
             label = { Text("Home", color = if (currentRoute == "home") VaultGold else VaultGrey, fontWeight = if (currentRoute == "home") FontWeight.Bold else FontWeight.Normal) },
             selected = currentRoute == "home",
             onClick = { onNavigate("home") },
-            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f), selectedIconColor = VaultGold, unselectedIconColor = VaultGrey)
         )
         NavigationBarItem(
-            icon = { Text("⚡", fontSize = 20.sp) },
+            icon = { Icon(Icons.Filled.FlashOn, contentDescription = "Tasks", modifier = Modifier.size(24.dp)) },
             label = { Text("Tasks", color = if (currentRoute == "tasks") VaultGold else VaultGrey, fontWeight = if (currentRoute == "tasks") FontWeight.Bold else FontWeight.Normal) },
             selected = currentRoute == "tasks",
             onClick = { onNavigate("tasks") },
-            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f), selectedIconColor = VaultGold, unselectedIconColor = VaultGrey)
         )
         NavigationBarItem(
-            icon = { Text("🎮", fontSize = 20.sp) },
+            icon = { Icon(Icons.Filled.VideogameAsset, contentDescription = "Games", modifier = Modifier.size(24.dp)) },
             label = { Text("Games", color = if (currentRoute == "games") VaultGold else VaultGrey, fontWeight = if (currentRoute == "games") FontWeight.Bold else FontWeight.Normal) },
             selected = currentRoute == "games",
             onClick = { onNavigate("games") },
-            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f), selectedIconColor = VaultGold, unselectedIconColor = VaultGrey)
         )
         NavigationBarItem(
-            icon = { Text("👤", fontSize = 20.sp) },
+            icon = { Icon(Icons.Filled.Person, contentDescription = "Me", modifier = Modifier.size(24.dp)) },
             label = { Text("Me", color = if (currentRoute == "profile") VaultGold else VaultGrey, fontWeight = if (currentRoute == "profile") FontWeight.Bold else FontWeight.Normal) },
             selected = currentRoute == "profile",
             onClick = { onNavigate("profile") },
-            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f))
+            colors = NavigationBarItemDefaults.colors(indicatorColor = VaultPurple.copy(alpha = 0.2f), selectedIconColor = VaultGold, unselectedIconColor = VaultGrey)
         )
     }
 }
@@ -146,12 +152,12 @@ fun HomeHeader() {
             modifier = Modifier
                 .size(42.dp)
                 .clip(CircleShape)
-                .background(VaultCardLight)
+                .background(VaultCard)
                 .border(1.dp, Color.White.copy(alpha = 0.05f), CircleShape)
                 .clickable { },
             contentAlignment = Alignment.Center
         ) {
-            Text("🔔", fontSize = 19.sp)
+            Icon(Icons.Filled.Notifications, contentDescription = "Notifications", tint = VaultWhite, modifier = Modifier.size(20.dp))
             
             // Notification Badge Dot
             Box(
@@ -209,7 +215,9 @@ fun HeroBalanceCard() {
                 Spacer(modifier = Modifier.height(6.dp))
                 
                 Row(verticalAlignment = Alignment.Bottom) {
-                    Text("⚡ 1,700 ", color = VaultGold, fontSize = 38.sp, fontWeight = FontWeight.Black, letterSpacing = (-1).sp)
+                    Icon(Icons.Filled.FlashOn, contentDescription = "Sparks", tint = VaultGold, modifier = Modifier.size(32.dp).padding(bottom = 4.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("1,700 ", color = VaultGold, fontSize = 38.sp, fontWeight = FontWeight.Black, letterSpacing = (-1).sp)
                     Text("Sparks", color = VaultGold.copy(alpha = 0.8f), fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 6.dp))
                 }
                 
@@ -249,7 +257,8 @@ fun DailyTaskBanner(onClick: () -> Unit) {
         ) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("⚡ ", fontSize = 16.sp)
+                    Icon(Icons.Filled.FlashOn, contentDescription = "Task", tint = VaultWhite, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text("AAJKA TASK ", color = VaultWhite, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
                     Box(
                         modifier = Modifier

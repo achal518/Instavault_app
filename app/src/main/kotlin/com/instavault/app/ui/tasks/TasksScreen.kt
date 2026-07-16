@@ -8,6 +8,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -155,7 +158,7 @@ fun TaskItemNeo(
                         .background(VaultGold.copy(alpha = 0.15f))
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
-                    Text("✦", color = VaultGold, fontSize = 12.sp)
+                    Icon(Icons.Filled.FlashOn, contentDescription = "Sparks", tint = VaultGold, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(task.reward, color = VaultGold, fontSize = 13.sp, fontWeight = FontWeight.Black)
                 }

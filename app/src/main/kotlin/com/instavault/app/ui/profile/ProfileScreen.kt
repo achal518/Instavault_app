@@ -65,15 +65,6 @@ fun ProfileScreen() {
             .padding(horizontal = 16.dp),
         contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
     ) {
-        item {
-            Text(
-                text = "👤 My Vault",
-                color = VaultWhite,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
-        }
 
         item {
             ProfileHeaderCard()

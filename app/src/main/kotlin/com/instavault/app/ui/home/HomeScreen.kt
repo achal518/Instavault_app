@@ -29,17 +29,21 @@ fun HomeScreen(
     onNavigateToGames: () -> Unit = {},
     onNavigateToSpin: () -> Unit = {}
 ) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VaultBg)
-            .padding(horizontal = 16.dp),
-        contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
     ) {
-        item { HomeHeader() }
-        item { Spacer(modifier = Modifier.height(18.dp)) }
-        item { HeroBalanceCard() }
-        item { Spacer(modifier = Modifier.height(14.dp)) }
+        HomeHeader()
+        
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
+        ) {
+            item { HeroBalanceCard() }
+            item { Spacer(modifier = Modifier.height(14.dp)) }
         item { DailyTaskBanner(onNavigateToTasks) }
         item { Spacer(modifier = Modifier.height(24.dp)) }
         item { SectionTitle("QUICK ACTIONS") }
@@ -49,6 +53,7 @@ fun HomeScreen(
         item { SectionTitle("RECENT ACTIVITY") }
         item { Spacer(modifier = Modifier.height(10.dp)) }
         item { RecentActivityList() }
+        }
     }
 }
 
@@ -96,38 +101,67 @@ fun VaultBottomNavigation(
 @Composable
 fun HomeHeader() {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(VaultBg.copy(alpha = 0.95f))
+            .drawBehind {
+                drawLine(
+                    color = Color.White.copy(alpha = 0.05f),
+                    start = androidx.compose.ui.geometry.Offset(0f, size.height),
+                    end = androidx.compose.ui.geometry.Offset(size.width, size.height),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
+            .padding(top = 8.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            Text("Welcome back,", color = VaultGrey, fontSize = 12.sp)
-            Text("Rahul 👋", color = VaultWhite, fontSize = 22.sp, fontWeight = FontWeight.Black)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // Avatar match
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .border(1.5f.dp, VaultPurple, CircleShape)
+                    .padding(2.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Brush.linearGradient(listOf(VaultGold, VaultPurple))),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("RA", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text("Namaste 👋", color = VaultGrey, fontSize = 11.sp)
+                Text("Rahul", color = VaultWhite, fontSize = 17.sp, fontWeight = FontWeight.Black)
+            }
         }
         
         Box(
             modifier = Modifier
-                .size(44.dp)
+                .size(42.dp)
                 .clip(CircleShape)
-                .background(Brush.linearGradient(listOf(VaultPurple, VaultPurpleLight)))
+                .background(VaultCardLight)
+                .border(1.dp, Color.White.copy(alpha = 0.05f), CircleShape)
                 .clickable { },
             contentAlignment = Alignment.Center
         ) {
-            Text("🔔", fontSize = 20.sp)
+            Text("🔔", fontSize = 19.sp)
             
-            // Notification Badge
+            // Notification Badge Dot
             Box(
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(7.dp)
                     .align(Alignment.TopEnd)
-                    .offset(x = (-2).dp, y = 2.dp)
+                    .offset(x = (-11).dp, y = 10.dp)
                     .clip(CircleShape)
                     .background(VaultRed)
-                    .border(2.dp, VaultBg, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("3", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold)
-            }
+            )
         }
     }
 }

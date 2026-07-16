@@ -79,10 +79,7 @@ fun ProfileScreen() {
             ProfileHeaderCard()
         }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            StatsGrid(stats = stats)
-        }
+
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
@@ -119,7 +116,23 @@ fun ProfileHeaderCard() {
                 .clip(RoundedCornerShape(24.dp))
                 .background(Brush.linearGradient(listOf(VaultPurple.copy(alpha = 0.5f), VaultCard)))
                 .border(1.dp, VaultPurple.copy(alpha = 0.15f), RoundedCornerShape(24.dp))
-        )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 22.dp, start = 16.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HeaderStat(value = "2,470", label = "Balance")
+                Box(modifier = Modifier.height(24.dp).width(1.dp).background(Color.White.copy(alpha = 0.15f)))
+                HeaderStat(value = "12,840", label = "Earned")
+                Box(modifier = Modifier.height(24.dp).width(1.dp).background(Color.White.copy(alpha = 0.15f)))
+                HeaderStat(value = "#128", label = "Rank")
+                Box(modifier = Modifier.height(24.dp).width(1.dp).background(Color.White.copy(alpha = 0.15f)))
+                HeaderStat(value = "5🔥", label = "Streak")
+            }
+        }
         
         // Avatar and Info overlay
         Column(
@@ -162,34 +175,10 @@ fun ProfileHeaderCard() {
 }
 
 @Composable
-fun StatsGrid(stats: List<StatData>) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            StatCard(stats[0], Modifier.weight(1f))
-            StatCard(stats[1], Modifier.weight(1f))
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            StatCard(stats[2], Modifier.weight(1f))
-            StatCard(stats[3], Modifier.weight(1f))
-        }
-    }
-}
-
-@Composable
-fun StatCard(stat: StatData, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(VaultCard)
-            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(20.dp))
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(stat.icon, fontSize = 26.sp, modifier = Modifier.padding(bottom = 4.dp))
-            Text(stat.value, color = VaultWhite, fontSize = 22.sp, fontWeight = FontWeight.Black)
-            Text(stat.label, color = VaultGrey, fontSize = 11.sp)
-        }
+fun HeaderStat(value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, color = VaultWhite, fontSize = 15.sp, fontWeight = FontWeight.Black)
+        Text(label, color = VaultGrey, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
     }
 }
 

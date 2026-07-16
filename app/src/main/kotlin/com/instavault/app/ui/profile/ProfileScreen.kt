@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -98,7 +99,7 @@ fun ProfileScreen() {
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            ActionButtons()
+            SettingsSection()
         }
     }
 }
@@ -245,28 +246,61 @@ fun BadgeCard(badge: BadgeData, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ActionButtons() {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        ActionButton("📲", "Telegram Bot Pe Jaao")
-        ActionButton("⚙️", "Settings")
+@Composable
+fun SettingsSection() {
+    Column {
+        Text(
+            text = "SETTINGS",
+            color = VaultGrey,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 2.sp,
+            modifier = Modifier.padding(bottom = 10.dp)
+        )
+        
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(VaultCardLight)
+                .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+        ) {
+            SettingRow("🔔", "Notifications", isFirst = true)
+            SettingRow("🌐", "Language — Hinglish")
+            SettingRow("ℹ️", "Help & Support")
+            SettingRow("🚪", "Logout", isLogout = true)
+        }
     }
 }
 
 @Composable
-fun ActionButton(icon: String, text: String, onClick: () -> Unit = {}) {
+fun SettingRow(icon: String, text: String, isFirst: Boolean = false, isLogout: Boolean = false, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(VaultCardLight)
-            .border(1.dp, Color.White.copy(alpha = 0.06f), RoundedCornerShape(14.dp))
             .clickable { onClick() }
-            .padding(horizontal = 18.dp, vertical = 14.dp),
+            .then(
+                if (!isFirst) Modifier.drawBehind {
+                    drawLine(
+                        color = Color.White.copy(alpha = 0.05f),
+                        start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                        end = androidx.compose.ui.geometry.Offset(size.width, 0f),
+                        strokeWidth = 1.dp.toPx()
+                    )
+                } else Modifier
+            )
+            .padding(horizontal = 18.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(icon, fontSize = 18.sp)
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text, color = VaultWhite, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-        Text("→", color = VaultGrey, fontSize = 16.sp)
+        Spacer(modifier = Modifier.width(14.dp))
+        Text(
+            text = text, 
+            color = if (isLogout) VaultRed else VaultWhite, 
+            fontSize = 14.sp, 
+            fontWeight = FontWeight.SemiBold, 
+            modifier = Modifier.weight(1f)
+        )
+        Text("›", color = VaultGrey, fontSize = 20.sp)
     }
 }

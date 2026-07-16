@@ -78,9 +78,12 @@ fun ProfileScreen() {
         item {
             ProfileHeaderCard()
         }
-
-
-
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            LinkedInstagramCard()
+            Spacer(modifier = Modifier.height(16.dp))
+            OrderViewsCTA()
+        }
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -290,5 +293,74 @@ fun SettingRow(icon: String, text: String, isFirst: Boolean = false, isLogout: B
             modifier = Modifier.weight(1f)
         )
         Text("›", color = VaultGrey, fontSize = 20.sp)
+    }
+}
+
+@Composable
+fun LinkedInstagramCard() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(VaultCardLight)
+            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // IG Icon Box
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .clip(CircleShape)
+                .background(VaultPurple.copy(alpha = 0.12f))
+                .border(1.dp, VaultPurple.copy(alpha = 0.4f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("📷", fontSize = 18.sp)
+        }
+        
+        Spacer(modifier = Modifier.width(12.dp))
+        
+        Column(modifier = Modifier.weight(1f)) {
+            Text("Linked Instagram", color = VaultGrey, fontSize = 11.sp)
+            Text("@achal.creates", color = VaultWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+        }
+        
+        // Verified Chip
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(Color(0xFF3B82F6).copy(alpha = 0.12f))
+                .border(1.dp, Color(0xFF3B82F6).copy(alpha = 0.4f), RoundedCornerShape(50))
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("✓", color = Color(0xFF3B82F6), fontSize = 10.sp, fontWeight = FontWeight.Black)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("Verified", color = Color(0xFF3B82F6), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+@Composable
+fun OrderViewsCTA() {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(Brush.linearGradient(listOf(VaultGold, VaultPurple)))
+                .clickable { }
+                .padding(vertical = 14.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("✈️", fontSize = 18.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Order Views on Bot", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Sparks se views order karne bot par jao ↗", color = VaultGrey, fontSize = 11.5.sp)
     }
 }

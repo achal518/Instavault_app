@@ -67,7 +67,7 @@ fun GameScreen(
             columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.weight(1f)
         ) {
             items(games) { game ->
                 GameCard(game = game, onClick = { onNavigateToGame(game.id) })

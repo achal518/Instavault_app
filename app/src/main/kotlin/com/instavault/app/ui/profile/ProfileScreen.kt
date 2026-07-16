@@ -25,9 +25,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.instavault.app.R
 import com.instavault.app.ui.home.TagItem
 import com.instavault.app.ui.theme.*
 
@@ -310,7 +312,7 @@ fun LinkedInstagramCard() {
                 .border(1.dp, VaultPurple.copy(alpha = 0.4f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Icon(com.instavault.app.ui.theme.InstagramIcon, contentDescription = "Instagram", tint = VaultPurple, modifier = Modifier.size(20.dp))
+            Icon(painterResource(id = R.drawable.ic_instagram), contentDescription = "Instagram", tint = VaultPurple, modifier = Modifier.size(20.dp))
         }
         
         Spacer(modifier = Modifier.width(12.dp))

@@ -246,7 +246,6 @@ fun BadgeCard(badge: BadgeData, modifier: Modifier = Modifier) {
 }
 
 @Composable
-@Composable
 fun SettingsSection() {
     Column {
         Text(

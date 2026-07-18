@@ -18,7 +18,7 @@ class PlayIntegrityManager private constructor(context: Context) {
 
     // IMPORTANT: If you verify requests on your own server using a custom Google Cloud Project,
     // specify the project number here. If you rely purely on the Play Console default link, leave it null.
-    private val cloudProjectNumber: Long? = null 
+    private val cloudProjectNumber: Long? = 1040039421212L
 
     companion object {
         @Volatile

@@ -8,3 +8,10 @@ local.properties
 build_debug.log
 gradle_error.txt
 *.log
+firebase_credentials.json
+myapp-security.jks
+.myapp-security.jks.swp
+keystore_base64.txt
+job_logs.txt
+job_logs2.txt
+master_auth_flow_plan.md

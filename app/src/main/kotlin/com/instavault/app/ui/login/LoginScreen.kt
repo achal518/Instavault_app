@@ -19,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -29,8 +27,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -48,10 +46,19 @@ fun LoginScreen(
     val digits by viewModel.digits.collectAsState()
     val state by viewModel.loginState.collectAsState()
     val userName by viewModel.userName.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val loadingMessage by viewModel.loadingMessage.collectAsState()
 
     var showSplash by remember { mutableStateOf(true) }
 
+    // Auto-Login Check & Splash Screen Handler
     LaunchedEffect(Unit) {
+        // First check if user has a valid encrypted session stored
+        if (viewModel.checkExistingSession()) {
+            onNavigateNext()
+            return@LaunchedEffect
+        }
+        // If no session, show splash briefly then reveal login
         delay(1200)
         showSplash = false
     }
@@ -107,6 +114,8 @@ fun LoginScreen(
                 LoginView(
                     digits = digits,
                     state = state,
+                    errorMessage = errorMessage,
+                    loadingMessage = loadingMessage,
                     onDigitChange = viewModel::onDigitChange,
                     onConnect = viewModel::onConnect,
                     onFillDemo = viewModel::onFillDemo,
@@ -120,98 +129,48 @@ fun LoginScreen(
 @Composable
 fun SuccessView(userName: String, onReset: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(24.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(90.dp)
-                .shadow(12.dp, CircleShape)
+                .size(96.dp)
+                .shadow(20.dp, CircleShape)
                 .clip(CircleShape)
-                .background(Brush.linearGradient(listOf(VaultGreen.copy(alpha = 0.2f), VaultGreen.copy(alpha = 0.07f))))
-                .border(3.dp, VaultGreen.copy(alpha = 0.4f), CircleShape),
+                .background(Brush.linearGradient(listOf(VaultGreen, Color(0xFF00E676))))
+                .border(3.dp, VaultGreen.copy(alpha = 0.6f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Filled.CheckCircle, contentDescription = "Success", tint = VaultWhite, modifier = Modifier.size(40.dp))
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Text("Connected!", color = VaultWhite, fontSize = 22.sp, fontWeight = FontWeight.Black)
-        Spacer(modifier = Modifier.height(6.dp))
-        Text("Welcome back, $userName!", color = VaultGreyLight, fontSize = 13.sp)
-        Spacer(modifier = Modifier.height(28.dp))
-
-        // User Card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .shadow(16.dp, RoundedCornerShape(24.dp))
-                .clip(RoundedCornerShape(24.dp))
-                .background(Brush.linearGradient(listOf(VaultPurple.copy(alpha = 0.13f), VaultCard)))
-                .border(1.dp, VaultPurple.copy(alpha = 0.27f), RoundedCornerShape(24.dp))
-                .padding(22.dp)
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(VaultPurple, VaultPurpleLight)))
-                            .border(2.dp, VaultGold.copy(alpha = 0.27f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(userName.take(1), color = VaultWhite, fontSize = 20.sp, fontWeight = FontWeight.Black)
-                    }
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column {
-                        Text(userName, color = VaultWhite, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
-                        Text("VLT-*****", color = VaultGrey, fontSize = 11.sp)
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(VaultGreen.copy(alpha = 0.13f))
-                            .border(1.dp, VaultGreen.copy(alpha = 0.27f), RoundedCornerShape(20.dp))
-                            .padding(horizontal = 12.dp, vertical = 4.dp)
-                    ) {
-                        Text("● Connected", color = VaultGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
+            Icon(Icons.Filled.Check, contentDescription = "Success", tint = VaultWhite, modifier = Modifier.size(48.dp))
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        Button(
-            onClick = { /* Navigate to Home/Vault */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .shadow(8.dp, RoundedCornerShape(16.dp)),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            contentPadding = PaddingValues(0.dp),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Brush.linearGradient(listOf(VaultPurple, VaultPurpleLight))),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.RocketLaunch, contentDescription = null, tint = VaultWhite, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Enter InstaVault", color = VaultWhite, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-                }
-            }
-        }
+
+        Text(
+            text = "Welcome Back!",
+            color = VaultGold,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = userName,
+            color = VaultWhite,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
         Spacer(modifier = Modifier.height(12.dp))
-        TextButton(onClick = onReset) {
-            Text("← Dusra account use karo", color = VaultGrey, fontSize = 13.sp)
-        }
+
+        Text(
+            text = "Vault Authenticated & Session Encrypted",
+            color = VaultGreyLight,
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -219,6 +178,8 @@ fun SuccessView(userName: String, onReset: () -> Unit) {
 fun LoginView(
     digits: List<String>,
     state: LoginState,
+    errorMessage: String?,
+    loadingMessage: String,
     onDigitChange: (Int, String) -> Unit,
     onConnect: () -> Unit,
     onFillDemo: (String) -> Unit,
@@ -227,7 +188,7 @@ fun LoginView(
     val isFilled = digits.all { it.isNotEmpty() }
     val focusRequesters = remember { List(5) { FocusRequester() } }
     val haptic = LocalHapticFeedback.current
-    
+
     var showHelp by remember { mutableStateOf(false) }
     var showDemo by remember { mutableStateOf(false) }
 
@@ -279,7 +240,7 @@ fun LoginView(
             }
         }
     }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -298,122 +259,104 @@ fun LoginView(
                 .border(2.dp, VaultPurpleLight.copy(alpha = 0.4f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Filled.FlashOn, contentDescription = null, tint = VaultWhite, modifier = Modifier.size(32.dp))
+            Icon(Icons.Filled.FlashOn, contentDescription = "Logo", tint = VaultWhite, modifier = Modifier.size(38.dp))
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("InstaVault", color = VaultWhite, fontSize = 26.sp, fontWeight = FontWeight.Black)
-        Spacer(modifier = Modifier.height(6.dp))
-        Text("CONNECT YOUR ACCOUNT", color = VaultGrey, fontSize = 12.sp, letterSpacing = 1.sp)
-        
-        Spacer(modifier = Modifier.height(48.dp))
-        
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                "Enter your 5-digit Vault ID",
-                color = VaultGreyLight,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(
-                onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    showHelp = true 
-                },
-                modifier = Modifier.size(20.dp)
-            ) {
-                Icon(Icons.Filled.Info, contentDescription = null, tint = VaultGrey, modifier = Modifier.size(16.dp))
-            }
-        }
+
         Spacer(modifier = Modifier.height(20.dp))
-        
-        // Input Row with Shake Animation
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(x = shakeOffset.value.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
+
+        Text("InstaVault", color = VaultWhite, fontSize = 28.sp, fontWeight = FontWeight.Black)
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Enter Your Vault ID", color = VaultGreyLight, fontSize = 14.sp)
+            Spacer(modifier = Modifier.width(6.dp))
+            Icon(
+                Icons.Filled.HelpOutline,
+                contentDescription = "Help",
+                tint = VaultGold,
                 modifier = Modifier
-                    .shadow(4.dp, RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(VaultPurple.copy(alpha = 0.13f))
-                    .border(1.5f.dp, VaultPurple.copy(alpha = 0.27f), RoundedCornerShape(12.dp))
-                    .padding(14.dp)
-            ) {
-                Text("VLT-", color = VaultPurple, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            
-            digits.forEachIndexed { index, d ->
+                    .size(16.dp)
+                    .clickable { showHelp = true }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(36.dp))
+
+        // 5-Digit Input Fields
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.offset(x = shakeOffset.value.dp)
+        ) {
+            val clipboardManager = LocalClipboardManager.current
+            digits.forEachIndexed { index, digit ->
                 BasicTextField(
-                    value = d,
-                    onValueChange = { 
-                        if (it.length > 1) { // Handle Paste
-                            val digitsPasted = it.filter { char -> char.isDigit() }
-                            if (digitsPasted.length == 5) {
-                                onPaste(digitsPasted)
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onConnect() // Auto-connect
-                            }
-                        } else if (it.length <= 1) {
-                            onDigitChange(index, it)
-                            if (it.isNotEmpty()) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            if (it.isNotEmpty() && index < 4) {
-                                focusRequesters[index + 1].requestFocus()
-                            }
-                            if (it.isNotEmpty() && index == 4) {
-                                // Auto-submit when last digit is typed
-                                onConnect()
-                            }
+                    value = digit,
+                    onValueChange = { input ->
+                        if (input.length > 1) {
+                            onPaste(input)
+                            return@BasicTextField
+                        }
+                        onDigitChange(index, input)
+                        if (input.isNotEmpty() && index < 4) {
+                            focusRequesters[index + 1].requestFocus()
                         }
                     },
                     modifier = Modifier
-                        .padding(end = if (index < 4) 10.dp else 0.dp)
-                        .size(width = 44.dp, height = 54.dp)
+                        .size(54.dp)
                         .focusRequester(focusRequesters[index])
-                        .onKeyEvent { 
-                            if (it.key == Key.Backspace && d.isEmpty() && index > 0) {
+                        .onKeyEvent { keyEvent ->
+                            if (keyEvent.key == Key.Backspace && digit.isEmpty() && index > 0) {
                                 focusRequesters[index - 1].requestFocus()
+                                onDigitChange(index - 1, "")
                                 true
-                            } else {
-                                false
-                            }
-                        }
-                        .shadow(if (d.isNotEmpty()) 8.dp else 0.dp, RoundedCornerShape(12.dp))
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (d.isNotEmpty()) VaultPurple.copy(alpha = 0.13f) else VaultCard)
-                        .border(
-                            1.5f.dp, 
-                            if (state == LoginState.ERROR) VaultRed.copy(alpha = 0.6f) 
-                            else if (d.isNotEmpty()) VaultPurple.copy(alpha = 0.53f) 
-                            else VaultWhite.copy(alpha = 0.08f),
-                            RoundedCornerShape(12.dp)
-                        ),
-                    textStyle = TextStyle(
-                        color = VaultGold,
+                            } else false
+                        },
+                    textStyle = LocalTextStyle.current.copy(
+                        color = if (state == LoginState.ERROR) VaultRed else VaultWhite,
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Black,
+                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     ),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                     singleLine = true,
                     cursorBrush = SolidColor(VaultGold),
                     decorationBox = { innerTextField ->
-                        Box(contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(VaultCard)
+                                .border(
+                                    1.dp,
+                                    when {
+                                        state == LoginState.ERROR -> VaultRed
+                                        digit.isNotEmpty() -> VaultPurpleLight
+                                        else -> VaultPurple.copy(alpha = 0.2f)
+                                    },
+                                    RoundedCornerShape(14.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
                             innerTextField()
                         }
                     }
                 )
             }
         }
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        Box(modifier = Modifier.fillMaxWidth().height(24.dp), contentAlignment = Alignment.Center) {
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Status & Error Display Area
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
             val assembled = digits.joinToString("")
-            if (isFilled && state != LoginState.ERROR) {
+            if (isFilled && state == LoginState.IDLE) {
                 Text(
                     text = "VLT-$assembled",
                     color = VaultGold,
@@ -426,21 +369,43 @@ fun LoginView(
                         .padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             } else if (state == LoginState.ERROR) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Error, contentDescription = null, tint = VaultRed, modifier = Modifier.size(14.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Invalid Vault ID", color = VaultRed, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(VaultRed.copy(alpha = 0.1f))
+                        .border(1.dp, VaultRed.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 14.dp, vertical = 6.dp)
+                ) {
+                    Icon(Icons.Filled.Error, contentDescription = null, tint = VaultRed, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = errorMessage ?: "Invalid Vault ID",
+                        color = VaultRed,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
                 }
+            } else if (state == LoginState.LOADING) {
+                Text(
+                    text = loadingMessage,
+                    color = VaultPurpleLight,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
-        Spacer(modifier = Modifier.height(48.dp))
+
+        Spacer(modifier = Modifier.height(40.dp))
+
         // Button Morphing Animation
         val buttonWidth by animateDpAsState(
             targetValue = if (state == LoginState.LOADING) 56.dp else 300.dp,
             animationSpec = tween(300, easing = FastOutSlowInEasing),
             label = "btnWidth"
         )
-        
+
         val infiniteTransition = rememberInfiniteTransition(label = "")
         val rotation by infiniteTransition.animateFloat(
             initialValue = 0f,
@@ -490,19 +455,19 @@ fun LoginView(
                 }
             }
         }
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
+
+        Spacer(modifier = Modifier.height(28.dp))
+
         TextButton(onClick = { showDemo = !showDemo }) {
             Text(if (showDemo) "Hide Demo Accounts" else "Try Demo Account", color = VaultGrey, fontSize = 11.sp)
         }
-        
+
         AnimatedVisibility(visible = showDemo) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val mocks = listOf("VLT-00001", "VLT-00847", "VLT-01234")
+                val mocks = listOf("VLT-7437014244", "VLT-5638105912", "VLT-5746912333")
                 mocks.forEach { id ->
                     Row(
                         modifier = Modifier
@@ -510,16 +475,16 @@ fun LoginView(
                             .clip(RoundedCornerShape(12.dp))
                             .background(VaultPurple.copy(alpha = 0.1f))
                             .border(1.dp, VaultPurple.copy(alpha = 0.25f), RoundedCornerShape(12.dp))
-                            .clickable { 
+                            .clickable {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                onFillDemo(id) 
+                                onFillDemo(id)
                             }
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(id, color = VaultPurpleLight, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                        Text("Demo User", color = VaultGrey, fontSize = 11.sp)
+                        Text("Real Vault User", color = VaultGrey, fontSize = 11.sp)
                     }
                 }
             }

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,20 +28,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.instavault.app.data.remote.dto.UserProfile
 import com.instavault.app.ui.theme.*
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
     onNavigateToTasks: () -> Unit = {},
     onNavigateToGames: () -> Unit = {},
-    onNavigateToSpin: () -> Unit = {}
+    onNavigateToSpin: () -> Unit = {},
+    viewModel: HomeViewModel = viewModel()
 ) {
+    val userProfile by viewModel.userProfile.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VaultBg)
     ) {
-        HomeHeader()
+        HomeHeader(userProfile = userProfile)
         
         LazyColumn(
             modifier = Modifier
@@ -48,17 +55,17 @@ fun HomeScreen(
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
         ) {
-            item { HeroBalanceCard() }
+            item { HeroBalanceCard(userProfile = userProfile) }
             item { Spacer(modifier = Modifier.height(14.dp)) }
-        item { DailyTaskBanner(onNavigateToTasks) }
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-        item { SectionTitle("QUICK ACTIONS") }
-        item { Spacer(modifier = Modifier.height(10.dp)) }
-        item { QuickActionsGrid(onNavigateToGames, onNavigateToSpin) }
-        item { Spacer(modifier = Modifier.height(24.dp)) }
-        item { SectionTitle("RECENT ACTIVITY") }
-        item { Spacer(modifier = Modifier.height(10.dp)) }
-        item { RecentActivityList() }
+            item { DailyTaskBanner(onNavigateToTasks) }
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { SectionTitle("QUICK ACTIONS") }
+            item { Spacer(modifier = Modifier.height(10.dp)) }
+            item { QuickActionsGrid(onNavigateToGames, onNavigateToSpin) }
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { SectionTitle("RECENT ACTIVITY") }
+            item { Spacer(modifier = Modifier.height(10.dp)) }
+            item { RecentActivityList() }
         }
     }
 }
@@ -105,7 +112,10 @@ fun VaultBottomNavigation(
 }
 
 @Composable
-fun HomeHeader() {
+fun HomeHeader(userProfile: UserProfile?) {
+    val displayName = userProfile?.firstName?.takeIf { it.isNotBlank() } ?: "Vault Member"
+    val initials = initialsFor(displayName)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,13 +148,13 @@ fun HomeHeader() {
                         .background(Brush.linearGradient(listOf(VaultGold, VaultPurple))),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("RA", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(initials, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text("Namaste 👋", color = VaultGrey, fontSize = 11.sp)
-                Text("Rahul", color = VaultWhite, fontSize = 17.sp, fontWeight = FontWeight.Black)
+                Text(displayName, color = VaultWhite, fontSize = 17.sp, fontWeight = FontWeight.Black)
             }
         }
         
@@ -173,7 +183,11 @@ fun HomeHeader() {
 }
 
 @Composable
-fun HeroBalanceCard() {
+fun HeroBalanceCard(userProfile: UserProfile?) {
+    val sparkBalance = userProfile?.sparkBalance ?: 0
+    val lifetimeSparks = userProfile?.lifetimeSparks ?: sparkBalance
+    val rankTier = userProfile?.rankTier?.takeIf { it.isNotBlank() } ?: "Rookie Vaulter"
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -217,22 +231,22 @@ fun HeroBalanceCard() {
                 Row(verticalAlignment = Alignment.Bottom) {
                     Icon(Icons.Filled.FlashOn, contentDescription = "Sparks", tint = VaultGold, modifier = Modifier.size(32.dp).padding(bottom = 4.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("1,700 ", color = VaultGold, fontSize = 38.sp, fontWeight = FontWeight.Black, letterSpacing = (-1).sp)
+                    Text("${formatSparkCount(sparkBalance)} ", color = VaultGold, fontSize = 38.sp, fontWeight = FontWeight.Black, letterSpacing = (-1).sp)
                     Text("Sparks", color = VaultGold.copy(alpha = 0.8f), fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 6.dp))
                 }
                 
                 Spacer(modifier = Modifier.height(10.dp))
                 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TagItem("🔥 Day 7 Streak", VaultGold)
-                    TagItem("🥉 Rookie", VaultGreyLight)
+                    TagItem("🔥 ${formatSparkCount(lifetimeSparks)} Lifetime", VaultGold)
+                    TagItem("🥉 $rankTier", VaultGreyLight)
                 }
                 
                 Spacer(modifier = Modifier.height(14.dp))
                 
-                Text("Rising Creator mein 910 RP aur", color = Color.White.copy(alpha = 0.4f), fontSize = 11.sp)
+                Text("Lifetime earnings: ${formatSparkCount(lifetimeSparks)} Sparks", color = Color.White.copy(alpha = 0.4f), fontSize = 11.sp)
                 Spacer(modifier = Modifier.height(6.dp))
-                CustomProgressBar(progress = 0.9f, color = VaultGold)
+                CustomProgressBar(progress = sparkProgress(sparkBalance), color = VaultGold)
             }
         }
     }
@@ -425,4 +439,24 @@ fun CustomProgressBar(progress: Float, color: Color) {
                 .background(Brush.horizontalGradient(listOf(color, color.copy(alpha = 0.67f))))
         )
     }
+}
+
+private fun initialsFor(name: String): String {
+    val compactName = name.trim()
+    if (compactName.isBlank()) return "VM"
+
+    val parts = compactName.split(Regex("\\s+"))
+    return if (parts.size > 1) {
+        "${parts[0].first()}${parts[1].first()}".uppercase(Locale.US)
+    } else {
+        compactName.take(2).uppercase(Locale.US)
+    }
+}
+
+private fun formatSparkCount(value: Int): String {
+    return String.format(Locale.US, "%,d", value)
+}
+
+private fun sparkProgress(sparkBalance: Int): Float {
+    return sparkBalance.coerceIn(0, 5_000) / 5_000f
 }

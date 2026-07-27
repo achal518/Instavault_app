@@ -18,13 +18,11 @@ import java.util.concurrent.TimeUnit
  *   - OkHttp logging interceptor for Logcat debugging
  *   - Gson converter for JSON serialization/deserialization
  *
- * BASE_URL points to 10.0.2.2 (Android emulator → host machine loopback).
- * In production, this will be replaced with the deployed server URL.
+ * BASE_URL points to the deployed InstaVault API server.
  */
 object RetrofitClient {
 
-    // 10.0.2.2 is the Android emulator's alias for host machine's localhost
-    private const val BASE_URL = "http://10.0.2.2:3000/"
+    private const val BASE_URL = "http://51.20.42.185:3000/"
     private const val HEADER_AUTHORIZATION = "Authorization"
     private const val HEADER_VAULT_ID = "X-Vault-ID"
 

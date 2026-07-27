@@ -6,6 +6,7 @@ local.properties
 
 # Logs
 build_debug.log
+build_out.txt
 gradle_error.txt
 *.log
 firebase_credentials.json
@@ -15,3 +16,6 @@ keystore_base64.txt
 job_logs.txt
 job_logs2.txt
 master_auth_flow_plan.md
+build/
+app/build/
+

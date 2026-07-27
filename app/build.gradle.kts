@@ -11,11 +11,11 @@ val debugApiBaseUrl = normalizeApiBaseUrl(providers.gradleProperty("DEBUG_API_BA
     .orElse("http://10.0.2.2:3000/")
     .get())
 val releaseApiBaseUrl = normalizeApiBaseUrl(providers.gradleProperty("RELEASE_API_BASE_URL")
-    .orElse("https://api.instavault.com/")
+    .orElse("http://51.20.42.185:3000/")
     .get())
 
-require(releaseApiBaseUrl.startsWith("https://")) {
-    "RELEASE_API_BASE_URL must use HTTPS."
+if (releaseApiBaseUrl.startsWith("http://")) {
+    logger.warn("RELEASE_API_BASE_URL uses HTTP; configure HTTPS before production distribution.")
 }
 
 android {

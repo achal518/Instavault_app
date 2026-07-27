@@ -16,6 +16,8 @@ keystore_base64.txt
 job_logs.txt
 job_logs2.txt
 master_auth_flow_plan.md
+*.md
 build/
 app/build/
+
 

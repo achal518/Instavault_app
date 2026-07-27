@@ -3,6 +3,21 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+fun normalizeApiBaseUrl(value: String): String = value.trim().let {
+    if (it.endsWith('/')) it else "$it/"
+}
+
+val debugApiBaseUrl = normalizeApiBaseUrl(providers.gradleProperty("DEBUG_API_BASE_URL")
+    .orElse("http://10.0.2.2:3000/")
+    .get())
+val releaseApiBaseUrl = normalizeApiBaseUrl(providers.gradleProperty("RELEASE_API_BASE_URL")
+    .orElse("https://api.instavault.com/")
+    .get())
+
+require(releaseApiBaseUrl.startsWith("https://")) {
+    "RELEASE_API_BASE_URL must use HTTPS."
+}
+
 android {
     namespace = "com.instavault.app"
     compileSdk = 34
@@ -27,7 +42,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
+        }
         release {
+            buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -40,6 +59,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     composeOptions {

@@ -1,6 +1,7 @@
 package com.instavault.app.data.remote
 
 import android.content.Context
+import com.instavault.app.BuildConfig
 import com.instavault.app.data.local.SessionExpiryNotifier
 import com.instavault.app.data.local.SessionManager
 import okhttp3.Interceptor
@@ -18,11 +19,10 @@ import java.util.concurrent.TimeUnit
  *   - OkHttp logging interceptor for Logcat debugging
  *   - Gson converter for JSON serialization/deserialization
  *
- * BASE_URL points to the deployed InstaVault API server.
+ * The API base URL comes from the active Gradle build type.
  */
 object RetrofitClient {
 
-    private const val BASE_URL = "http://51.20.42.185:3000/"
     private const val HEADER_AUTHORIZATION = "Authorization"
     private const val HEADER_VAULT_ID = "X-Vault-ID"
 
@@ -40,7 +40,11 @@ object RetrofitClient {
     }
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
     }
 
     private val authInterceptor = Interceptor { chain ->
@@ -77,7 +81,7 @@ object RetrofitClient {
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(BuildConfig.API_BASE_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

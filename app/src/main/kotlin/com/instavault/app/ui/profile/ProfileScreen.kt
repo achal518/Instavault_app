@@ -12,9 +12,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -30,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.instavault.app.R
+import com.instavault.app.data.remote.dto.UserProfile
 import com.instavault.app.ui.home.TagItem
 import com.instavault.app.ui.theme.*
 
@@ -46,7 +55,12 @@ data class StatData(
 )
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    onLogout: () -> Unit = {}
+) {
+    val profile by viewModel.userProfile.collectAsState()
+    var showLogoutConfirmation by remember { mutableStateOf(false) }
     val badges = listOf(
         BadgeData("🏅", "First Order", true),
         BadgeData("🔥", "3-Day", true),
@@ -72,11 +86,11 @@ fun ProfileScreen() {
     ) {
 
         item {
-            ProfileHeaderCard()
+            ProfileHeaderCard(profile)
         }
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            LinkedInstagramCard()
+            LinkedInstagramCard(profile?.instagramHandle)
             Spacer(modifier = Modifier.height(16.dp))
             OrderViewsCTA()
         }
@@ -95,13 +109,48 @@ fun ProfileScreen() {
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            SettingsSection()
+            SettingsSection(onLogout = { showLogoutConfirmation = true })
         }
+    }
+
+    if (showLogoutConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showLogoutConfirmation = false },
+            title = { Text("Log out?") },
+            text = { Text("Your encrypted session will be cleared from this device.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutConfirmation = false
+                        viewModel.logout()
+                        onLogout()
+                    }
+                ) {
+                    Text("Log out")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutConfirmation = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
 @Composable
-fun ProfileHeaderCard() {
+fun ProfileHeaderCard(profile: UserProfile?) {
+    val displayName = profile?.firstName?.takeIf { it.isNotBlank() } ?: "Vaulter"
+    val vaultId = profile?.vaultId ?: "Vault ID unavailable"
+    val initials = displayName
+        .trim()
+        .split(Regex("\\s+"))
+        .filter { it.isNotEmpty() }
+        .take(2)
+        .joinToString("") { it.first().uppercaseChar().toString() }
+        .ifBlank { "V" }
+    val rankTier = profile?.rankTier?.takeIf { it.isNotBlank() } ?: "Unranked"
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -123,13 +172,13 @@ fun ProfileHeaderCard() {
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                HeaderStat(value = "2,470", label = "Balance")
+                HeaderStat(value = profile?.sparkBalance?.toString() ?: "—", label = "Balance")
                 Box(modifier = Modifier.height(24.dp).width(1.dp).background(Color.White.copy(alpha = 0.15f)))
-                HeaderStat(value = "12,840", label = "Earned")
+                HeaderStat(value = profile?.lifetimeSparks?.toString() ?: "—", label = "Earned")
                 Box(modifier = Modifier.height(24.dp).width(1.dp).background(Color.White.copy(alpha = 0.15f)))
-                HeaderStat(value = "#128", label = "Rank")
+                HeaderStat(value = rankTier, label = "Rank")
                 Box(modifier = Modifier.height(24.dp).width(1.dp).background(Color.White.copy(alpha = 0.15f)))
-                HeaderStat(value = "5🔥", label = "Streak")
+                HeaderStat(value = profile?.totalOrders?.toString() ?: "—", label = "Orders")
             }
         }
         
@@ -158,17 +207,17 @@ fun ProfileHeaderCard() {
                         .background(Brush.linearGradient(listOf(VaultGold, VaultPurple))),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("RA", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Black)
+                    Text(initials, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Black)
                 }
             }
             
             Spacer(modifier = Modifier.height(12.dp))
             
-            Text("Rahul", color = VaultWhite, fontSize = 24.sp, fontWeight = FontWeight.Black)
+            Text(displayName, color = VaultWhite, fontSize = 24.sp, fontWeight = FontWeight.Black)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("@rahul_vault • #VLT-00001", color = VaultGrey, fontSize = 13.sp)
+            Text("${profile?.instagramHandle ?: "Instagram not linked"} • $vaultId", color = VaultGrey, fontSize = 13.sp)
             Spacer(modifier = Modifier.height(14.dp))
-            TagItem("🥉 Rookie Vaulter", VaultGold)
+            TagItem("$rankTier Vaulter", VaultGold)
         }
     }
 }
@@ -234,7 +283,7 @@ fun BadgeCard(badge: BadgeData, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SettingsSection() {
+fun SettingsSection(onLogout: () -> Unit) {
     Column {
         Text(
             text = "SETTINGS",
@@ -255,7 +304,7 @@ fun SettingsSection() {
             SettingRow("🔔", "Notifications", isFirst = true)
             SettingRow("🌐", "Language — Hinglish")
             SettingRow("ℹ️", "Help & Support")
-            SettingRow("🚪", "Logout", isLogout = true)
+            SettingRow("🚪", "Logout", isLogout = true, onClick = onLogout)
         }
     }
 }
@@ -293,7 +342,7 @@ fun SettingRow(icon: String, text: String, isFirst: Boolean = false, isLogout: B
 }
 
 @Composable
-fun LinkedInstagramCard() {
+fun LinkedInstagramCard(instagramHandle: String?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -319,7 +368,13 @@ fun LinkedInstagramCard() {
         
         Column(modifier = Modifier.weight(1f)) {
             Text("Linked Instagram", color = VaultGrey, fontSize = 11.sp)
-            Text("@achal.creates", color = VaultWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+            Text(
+                instagramHandle?.takeIf { it.isNotBlank() } ?: "Not linked",
+                color = VaultWhite,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 2.dp)
+            )
         }
         
         // Verified Chip

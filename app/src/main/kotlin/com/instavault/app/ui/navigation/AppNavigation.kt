@@ -87,7 +87,17 @@ fun AppNavigation() {
                 )
             }
             composable("profile") {
-                com.instavault.app.ui.profile.ProfileScreen()
+                com.instavault.app.ui.profile.ProfileScreen(
+                    onLogout = {
+                        sessionExpiredMessage = "You have been logged out."
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.id) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
         }
     }

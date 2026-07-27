@@ -6,6 +6,28 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 import com.instavault.app.data.remote.dto.UserProfile
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+/**
+ * App-wide auth event bridge.
+ *
+ * Network code raises this when a protected request receives 401.
+ * AppNavigation observes it and owns the UI/navigation response.
+ */
+object SessionExpiryNotifier {
+    private val _sessionExpired = MutableStateFlow(false)
+    val sessionExpired: StateFlow<Boolean> = _sessionExpired.asStateFlow()
+
+    fun notifySessionExpired() {
+        _sessionExpired.value = true
+    }
+
+    fun markHandled() {
+        _sessionExpired.value = false
+    }
+}
 
 /**
  * SessionManager — Secure Encrypted Session Storage
@@ -56,6 +78,7 @@ class SessionManager(context: Context) {
             .putString(KEY_VAULT_ID, vaultId)
             .putString(KEY_USER_PROFILE, profileJson)
             .apply()
+        SessionExpiryNotifier.markHandled()
     }
 
     /**

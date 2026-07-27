@@ -31,9 +31,10 @@ import java.util.Locale
  */
 class AuthRepository(private val context: Context) {
 
-    private val apiService = RetrofitClient.apiService
-    private val sessionManager = SessionManager(context)
-    private val playIntegrityManager = PlayIntegrityManager.getInstance(context)
+    private val appContext = context.applicationContext
+    private val apiService = RetrofitClient.getApiService(appContext)
+    private val sessionManager = SessionManager(appContext)
+    private val playIntegrityManager = PlayIntegrityManager.getInstance(appContext)
 
     companion object {
         private const val TAG = "AuthRepository"

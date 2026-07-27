@@ -43,6 +43,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
+    sessionExpiredMessage: String? = null,
     onNavigateNext: () -> Unit = {}
 ) {
     val digits by viewModel.digits.collectAsState()
@@ -51,7 +52,7 @@ fun LoginScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
     val loadingMessage by viewModel.loadingMessage.collectAsState()
 
-    var showSplash by remember { mutableStateOf(true) }
+    var showSplash by remember { mutableStateOf(sessionExpiredMessage == null) }
 
     // Auto-Login Check & Splash Screen Handler
     LaunchedEffect(Unit) {
@@ -61,7 +62,9 @@ fun LoginScreen(
             return@LaunchedEffect
         }
         // If no session, show splash briefly then reveal login
-        delay(1200)
+        if (sessionExpiredMessage == null) {
+            delay(1200)
+        }
         showSplash = false
     }
 
@@ -117,6 +120,7 @@ fun LoginScreen(
                     digits = digits,
                     state = state,
                     errorMessage = errorMessage,
+                    sessionExpiredMessage = sessionExpiredMessage,
                     loadingMessage = loadingMessage,
                     onDigitChange = viewModel::onDigitChange,
                     onConnect = viewModel::onConnect,
@@ -181,6 +185,7 @@ fun LoginView(
     digits: List<String>,
     state: LoginState,
     errorMessage: String?,
+    sessionExpiredMessage: String?,
     loadingMessage: String,
     onDigitChange: (Int, String) -> Unit,
     onConnect: () -> Unit,
@@ -384,6 +389,25 @@ fun LoginView(
                     Text(
                         text = errorMessage ?: "Invalid Vault ID",
                         color = VaultRed,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else if (sessionExpiredMessage != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(VaultGold.copy(alpha = 0.1f))
+                        .border(1.dp, VaultGold.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 14.dp, vertical = 6.dp)
+                ) {
+                    Icon(Icons.Filled.Error, contentDescription = null, tint = VaultGold, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = sessionExpiredMessage,
+                        color = VaultGold,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center

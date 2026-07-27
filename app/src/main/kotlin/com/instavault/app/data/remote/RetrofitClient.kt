@@ -1,5 +1,9 @@
 package com.instavault.app.data.remote
 
+import android.content.Context
+import com.instavault.app.data.local.SessionExpiryNotifier
+import com.instavault.app.data.local.SessionManager
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,15 +25,56 @@ object RetrofitClient {
 
     // 10.0.2.2 is the Android emulator's alias for host machine's localhost
     private const val BASE_URL = "http://10.0.2.2:3000/"
+    private const val HEADER_AUTHORIZATION = "Authorization"
+    private const val HEADER_VAULT_ID = "X-Vault-ID"
+
+    @Volatile
+    private var sessionManager: SessionManager? = null
+
+    fun initialize(context: Context) {
+        if (sessionManager != null) return
+
+        synchronized(this) {
+            if (sessionManager == null) {
+                sessionManager = SessionManager(context.applicationContext)
+            }
+        }
+    }
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val authInterceptor = Interceptor { chain ->
+        val activeSession = sessionManager
+        val token = activeSession?.getSessionToken()
+        val vaultId = activeSession?.getVaultId()
+        val requestBuilder = chain.request().newBuilder()
+
+        if (!token.isNullOrBlank() && chain.request().header(HEADER_AUTHORIZATION).isNullOrBlank()) {
+            requestBuilder.header(HEADER_AUTHORIZATION, "Bearer $token")
+        }
+
+        if (!vaultId.isNullOrBlank() && chain.request().header(HEADER_VAULT_ID).isNullOrBlank()) {
+            requestBuilder.header(HEADER_VAULT_ID, vaultId)
+        }
+
+        val hadSessionHeaders = !token.isNullOrBlank() || !vaultId.isNullOrBlank()
+        val response = chain.proceed(requestBuilder.build())
+
+        if (response.code == 401 && hadSessionHeaders) {
+            activeSession?.clearSession()
+            SessionExpiryNotifier.notifySessionExpired()
+        }
+
+        response
     }
 
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
+        .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
         .build()
 
@@ -44,4 +89,9 @@ object RetrofitClient {
      * Usage: `RetrofitClient.apiService.verifyVaultId(...)`
      */
     val apiService: ApiService = retrofit.create(ApiService::class.java)
+
+    fun getApiService(context: Context): ApiService {
+        initialize(context)
+        return apiService
+    }
 }

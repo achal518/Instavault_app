@@ -23,7 +23,7 @@ enum class LoginState { IDLE, LOADING, SUCCESS, ERROR }
  * AuthRepository-powered server authentication flow.
  *
  * Manages:
- *   - 5-digit Vault ID input state
+ *   - Variable-length Vault ID input state (VLT- + Telegram user ID)
  *   - Login state machine (IDLE → LOADING → SUCCESS/ERROR)
  *   - Error messages for user display
  *   - Authenticated user profile data
@@ -33,9 +33,13 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val authRepository = AuthRepository(application.applicationContext)
 
+    companion object {
+        const val MAX_VAULT_ID_DIGITS = 20
+    }
+
     // ── Input State ──
-    private val _digits = MutableStateFlow(List(5) { "" })
-    val digits: StateFlow<List<String>> = _digits.asStateFlow()
+    private val _vaultIdDigits = MutableStateFlow("")
+    val vaultIdDigits: StateFlow<String> = _vaultIdDigits.asStateFlow()
 
     // ── Login State Machine ──
     private val _loginState = MutableStateFlow(LoginState.IDLE)
@@ -60,11 +64,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Handle digit input change. Resets error state when user starts re-typing.
      */
-    fun onDigitChange(index: Int, value: String) {
-        if (!value.matches(Regex("^\\d?$"))) return
-        val currentDigits = _digits.value.toMutableList()
-        currentDigits[index] = value
-        _digits.value = currentDigits
+    fun onVaultIdChange(value: String) {
+        val normalizedDigits = value
+            .removePrefix("VLT-")
+            .removePrefix("vlt-")
+            .filter(Char::isDigit)
+            .take(MAX_VAULT_ID_DIGITS)
+
+        _vaultIdDigits.value = normalizedDigits
         if (_loginState.value == LoginState.ERROR) {
             _loginState.value = LoginState.IDLE
             _errorMessage.value = null
@@ -75,9 +82,13 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
      * Fill demo ID for quick testing. Preserves backward compatibility.
      */
     fun onFillDemo(id: String) {
-        val d = id.replace("VLT-", "").map { it.toString() }
-        if (d.size == 5) {
-            _digits.value = d
+        val normalizedDigits = id
+            .removePrefix("VLT-")
+            .removePrefix("vlt-")
+            .filter(Char::isDigit)
+            .take(MAX_VAULT_ID_DIGITS)
+        if (normalizedDigits.isNotEmpty()) {
+            _vaultIdDigits.value = normalizedDigits
             _loginState.value = LoginState.IDLE
             _errorMessage.value = null
         }
@@ -87,12 +98,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
      * Handle pasted Vault ID text.
      */
     fun onPaste(pasted: String) {
-        val d = pasted.filter { it.isDigit() }.map { it.toString() }.take(5)
-        if (d.size == 5) {
-            _digits.value = d
-            _loginState.value = LoginState.IDLE
-            _errorMessage.value = null
-        }
+        onVaultIdChange(pasted)
     }
 
     /**
@@ -106,9 +112,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
      *   Step 5: Send background telemetry
      */
     fun onConnect() {
-        val filled = _digits.value.all { it.isNotEmpty() }
-        if (!filled) return
-        val vaultId = "VLT-${_digits.value.joinToString("")}"
+        val vaultIdDigits = _vaultIdDigits.value
+        if (vaultIdDigits.isEmpty()) return
+        val vaultId = "VLT-$vaultIdDigits"
 
         _loginState.value = LoginState.LOADING
         _loadingMessage.value = "Verifying Vault ID..."
@@ -164,7 +170,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
      * Reset all state to initial values.
      */
     fun reset() {
-        _digits.value = List(5) { "" }
+        _vaultIdDigits.value = ""
         _loginState.value = LoginState.IDLE
         _userName.value = null
         _errorMessage.value = null

@@ -19,17 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,7 +40,7 @@ fun LoginScreen(
     sessionExpiredMessage: String? = null,
     onNavigateNext: () -> Unit = {}
 ) {
-    val digits by viewModel.digits.collectAsState()
+    val vaultIdDigits by viewModel.vaultIdDigits.collectAsState()
     val state by viewModel.loginState.collectAsState()
     val userName by viewModel.userName.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -117,15 +111,14 @@ fun LoginScreen(
                 SuccessView(userName = userName ?: "", onReset = { viewModel.reset() })
             } else {
                 LoginView(
-                    digits = digits,
+                    vaultIdDigits = vaultIdDigits,
                     state = state,
                     errorMessage = errorMessage,
                     sessionExpiredMessage = sessionExpiredMessage,
                     loadingMessage = loadingMessage,
-                    onDigitChange = viewModel::onDigitChange,
+                    onVaultIdChange = viewModel::onVaultIdChange,
                     onConnect = viewModel::onConnect,
-                    onFillDemo = viewModel::onFillDemo,
-                    onPaste = viewModel::onPaste
+                    onFillDemo = viewModel::onFillDemo
                 )
             }
         }
@@ -182,18 +175,16 @@ fun SuccessView(userName: String, onReset: () -> Unit) {
 
 @Composable
 fun LoginView(
-    digits: List<String>,
+    vaultIdDigits: String,
     state: LoginState,
     errorMessage: String?,
     sessionExpiredMessage: String?,
     loadingMessage: String,
-    onDigitChange: (Int, String) -> Unit,
+    onVaultIdChange: (String) -> Unit,
     onConnect: () -> Unit,
-    onFillDemo: (String) -> Unit,
-    onPaste: (String) -> Unit
+    onFillDemo: (String) -> Unit
 ) {
-    val isFilled = digits.all { it.isNotEmpty() }
-    val focusRequesters = remember { List(5) { FocusRequester() } }
+    val isFilled = vaultIdDigits.isNotEmpty()
     val haptic = LocalHapticFeedback.current
 
     var showHelp by remember { mutableStateOf(false) }
@@ -228,7 +219,7 @@ fun LoginView(
                     Text("Find Your Vault ID", color = VaultGold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        "Go to the InstaVault Telegram Bot and type /profile. You will find your unique #VLT-XXXXX ID there.",
+                        "Go to the InstaVault Telegram Bot and type /profile. You will find your unique VLT ID there.",
                         color = VaultGreyLight,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
@@ -290,68 +281,53 @@ fun LoginView(
 
         Spacer(modifier = Modifier.height(36.dp))
 
-        // 5-Digit Input Fields
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.offset(x = shakeOffset.value.dp)
-        ) {
-            val clipboardManager = LocalClipboardManager.current
-            digits.forEachIndexed { index, digit ->
-                BasicTextField(
-                    value = digit,
-                    onValueChange = { input ->
-                        if (input.length > 1) {
-                            onPaste(input)
-                            return@BasicTextField
-                        }
-                        onDigitChange(index, input)
-                        if (input.isNotEmpty() && index < 4) {
-                            focusRequesters[index + 1].requestFocus()
-                        }
-                    },
+        // Variable-length Vault ID input. Bot IDs are VLT- + Telegram user ID,
+        // so the numeric suffix is not limited to five digits.
+        BasicTextField(
+            value = vaultIdDigits,
+            onValueChange = onVaultIdChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(62.dp)
+                .offset(x = shakeOffset.value.dp),
+            textStyle = LocalTextStyle.current.copy(
+                color = if (state == LoginState.ERROR) VaultRed else VaultWhite,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Start
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            cursorBrush = SolidColor(VaultGold),
+            decorationBox = { innerTextField ->
+                Row(
                     modifier = Modifier
-                        .size(54.dp)
-                        .focusRequester(focusRequesters[index])
-                        .onKeyEvent { keyEvent ->
-                            if (keyEvent.key == Key.Backspace && digit.isEmpty() && index > 0) {
-                                focusRequesters[index - 1].requestFocus()
-                                onDigitChange(index - 1, "")
-                                true
-                            } else false
-                        },
-                    textStyle = LocalTextStyle.current.copy(
-                        color = if (state == LoginState.ERROR) VaultRed else VaultWhite,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    singleLine = true,
-                    cursorBrush = SolidColor(VaultGold),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(VaultCard)
-                                .border(
-                                    1.dp,
-                                    when {
-                                        state == LoginState.ERROR -> VaultRed
-                                        digit.isNotEmpty() -> VaultPurpleLight
-                                        else -> VaultPurple.copy(alpha = 0.2f)
-                                    },
-                                    RoundedCornerShape(14.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            innerTextField()
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(VaultCard)
+                        .border(
+                            1.dp,
+                            when {
+                                state == LoginState.ERROR -> VaultRed
+                                vaultIdDigits.isNotEmpty() -> VaultPurpleLight
+                                else -> VaultPurple.copy(alpha = 0.2f)
+                            },
+                            RoundedCornerShape(14.dp)
+                        )
+                        .padding(horizontal = 18.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("VLT-", color = VaultGold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Box(modifier = Modifier.weight(1f)) {
+                        if (vaultIdDigits.isEmpty()) {
+                            Text("Enter Telegram ID", color = VaultGrey, fontSize = 16.sp)
                         }
+                        innerTextField()
                     }
-                )
+                }
             }
-        }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -362,7 +338,7 @@ fun LoginView(
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            val assembled = digits.joinToString("")
+            val assembled = vaultIdDigits
             if (isFilled && state == LoginState.IDLE) {
                 Text(
                     text = "VLT-$assembled",
